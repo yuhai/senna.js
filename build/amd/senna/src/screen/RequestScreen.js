@@ -241,15 +241,12 @@ define(['exports', 'metal/src/metal', 'metal-ajax/src/Ajax', 'metal-structs/src/
 				if (_metal.core.isDefAndNotNull(cache)) {
 					return _Promise2.default.resolve(cache);
 				}
-
 				var body = null;
 				var httpMethod = this.httpMethod;
-
 				var headers = new _structs.MultiMap();
 				Object.keys(this.httpHeaders).forEach(function (header) {
 					return headers.add(header, _this2.httpHeaders[header]);
 				});
-
 				if (_globals2.default.capturedFormElement) {
 					body = new FormData(_globals2.default.capturedFormElement);
 					httpMethod = RequestScreen.POST;
@@ -257,7 +254,7 @@ define(['exports', 'metal/src/metal', 'metal-ajax/src/Ajax', 'metal-structs/src/
 						headers.add('If-None-Match', '"0"');
 					}
 				}
-
+				this.maybeAppendSubmitButtonValue_(body);
 				var requestPath = this.formatLoadPath(path);
 				return _Ajax2.default.request(requestPath, httpMethod, body, headers, null, this.timeout).then(function (xhr) {
 					_this2.setRequest(xhr);
@@ -278,6 +275,14 @@ define(['exports', 'metal/src/metal', 'metal-ajax/src/Ajax', 'metal-structs/src/
 					}
 					throw reason;
 				});
+			}
+		}, {
+			key: 'maybeAppendSubmitButtonValue_',
+			value: function maybeAppendSubmitButtonValue_(body) {
+				var button = _globals2.default.capturedFormButtonElement;
+				if (body && button && button.name && !button.disabled) {
+					body.append(button.name, button.value);
+				}
 			}
 		}, {
 			key: 'maybeExtractResponseUrlFromRequest',
