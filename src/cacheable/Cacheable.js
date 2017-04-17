@@ -1,9 +1,8 @@
 'use strict';
 
-import { Disposable } from 'metal';
+import {Disposable} from 'metal';
 
 class Cacheable extends Disposable {
-
 	/**
 	 * Abstract class for defining cacheable behavior.
 	 * @constructor
@@ -84,7 +83,6 @@ class Cacheable extends Disposable {
 		}
 		this.cacheable = cacheable;
 	}
-
 }
 
 export default Cacheable;

@@ -8,4 +8,4 @@ import Route from './route/Route';
 import Screen from './screen/Screen';
 
 export default App;
-export { utils, App, HtmlScreen, Route, RequestScreen, Screen };
+export {utils, App, HtmlScreen, Route, RequestScreen, Screen};

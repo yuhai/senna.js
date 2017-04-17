@@ -8,14 +8,17 @@ import Uri from 'metal-uri';
  * @const
  */
 class utils {
-
 	/**
 	 * Copies attributes form source node to target node.
 	 * @return {void}
 	 * @static
 	 */
 	static copyNodeAttributes(source, target) {
-		Array.prototype.slice.call(source.attributes).forEach((attribute) => target.setAttribute(attribute.name, attribute.value));
+		Array.prototype.slice
+			.call(source.attributes)
+			.forEach(attribute =>
+				target.setAttribute(attribute.name, attribute.value),
+			);
 	}
 
 	/**
@@ -24,7 +27,10 @@ class utils {
 	 * @static
 	 */
 	static getCurrentBrowserPath() {
-		return this.getCurrentBrowserPathWithoutHash() + globals.window.location.hash;
+		return (
+			this.getCurrentBrowserPathWithoutHash() +
+			globals.window.location.hash
+		);
 	}
 
 	/**
@@ -33,7 +39,9 @@ class utils {
 	 * @static
 	 */
 	static getCurrentBrowserPathWithoutHash() {
-		return globals.window.location.pathname + globals.window.location.search;
+		return (
+			globals.window.location.pathname + globals.window.location.search
+		);
 	}
 
 	/**
@@ -77,7 +85,10 @@ class utils {
 			const currentBrowserPath = this.getCurrentBrowserPathWithoutHash();
 			// the getUrlPath will create a Uri and will normalize the path and
 			// remove the trailling '/' for properly comparing paths.
-			return utils.getUrlPathWithoutHash(url) === this.getUrlPath(currentBrowserPath);
+			return (
+				utils.getUrlPathWithoutHash(url) ===
+				this.getUrlPath(currentBrowserPath)
+			);
 		}
 		return false;
 	}
@@ -97,9 +108,10 @@ class utils {
 	 * @static
 	 */
 	static clearNodeAttributes(node) {
-		Array.prototype.slice.call(node.attributes).forEach((attribute) => node.removeAttribute(attribute.name));
+		Array.prototype.slice
+			.call(node.attributes)
+			.forEach(attribute => node.removeAttribute(attribute.name));
 	}
-
 }
 
 export default utils;

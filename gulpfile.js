@@ -12,6 +12,7 @@ var stripDebug = require('gulp-strip-debug');
 // Metal -----------------------------------------------------------------------
 
 metal.registerTasks({
+	gulp: gulp,
 	bundleCssFileName: 'senna.css',
 	bundleFileName: 'senna.js',
 	globalName: 'senna',
@@ -22,59 +23,59 @@ metal.registerTasks({
 	testSaucelabsBrowsers: {
 		sl_chrome: {
 			base: 'SauceLabs',
-			browserName: 'chrome'
+			browserName: 'chrome',
 		},
 		sl_safari_8: {
 			base: 'SauceLabs',
 			browserName: 'safari',
-			version: '8'
+			version: '8',
 		},
 		sl_safari_9: {
 			base: 'SauceLabs',
 			browserName: 'safari',
-			version: '9'
+			version: '9',
 		},
 		sl_firefox: {
 			base: 'SauceLabs',
-			browserName: 'firefox'
+			browserName: 'firefox',
 		},
 		sl_ie_10: {
 			base: 'SauceLabs',
 			browserName: 'internet explorer',
 			platform: 'Windows 7',
-			version: '10'
+			version: '10',
 		},
 		sl_ie_11: {
 			base: 'SauceLabs',
 			browserName: 'internet explorer',
 			platform: 'Windows 8.1',
-			version: '11'
+			version: '11',
 		},
 		sl_edge_20: {
 			base: 'SauceLabs',
 			browserName: 'microsoftedge',
 			platform: 'Windows 10',
-			version: '13'
+			version: '13',
 		},
 		sl_iphone: {
 			base: 'SauceLabs',
 			browserName: 'iphone',
 			platform: 'OS X 10.10',
-			version: '9.2'
+			version: '9.2',
 		},
 		sl_android_4: {
 			base: 'SauceLabs',
 			browserName: 'android',
 			platform: 'Linux',
-			version: '4.4'
+			version: '4.4',
 		},
 		sl_android_5: {
 			base: 'SauceLabs',
 			browserName: 'android',
 			platform: 'Linux',
-			version: '5.0'
-		}
-	}
+			version: '5.0',
+		},
+	},
 });
 
 // Helpers ---------------------------------------------------------------------
@@ -88,49 +89,65 @@ gulp.task('banner', function() {
 		' * @link http://sennajs.com',
 		' * @license BSD-3-Clause',
 		' */',
-		''
+		'',
 	].join('\n');
 
-	return gulp.src('build/globals/*.js')
+	return gulp
+		.src('build/globals/*.js')
 		.pipe(header(stamp, require('./package.json')))
 		.pipe(gulp.dest('build/globals'));
 });
 
 gulp.task('clean:debug', function() {
-	return gulp.src('build/globals/senna.js')
+	return gulp
+		.src('build/globals/senna.js')
 		.pipe(rename('senna-debug.js'))
 		.pipe(gulp.dest('build/globals'));
 });
 
 gulp.task('clean:debug:globals', function() {
-	return gulp.src('build/globals/senna.js')
+	return gulp
+		.src('build/globals/senna.js')
 		.pipe(stripDebug())
 		.pipe(gulp.dest('build/globals'));
 });
 
 gulp.task('clean:debug:amd', function() {
-	return gulp.src('build/amd/senna/**/*.js')
+	return gulp
+		.src('build/amd/senna/**/*.js')
 		.pipe(stripDebug())
 		.pipe(gulp.dest('build/amd/senna'));
 });
 
 gulp.task('docs', function() {
-	return gulp.src(['src/**/*.js', 'README.md'])
-		.pipe(jsdoc({
+	return gulp.src(['src/**/*.js', 'README.md']).pipe(
+		jsdoc({
 			opts: {
-				destination: 'docs'
-			}
-		}));
+				destination: 'docs',
+			},
+		}),
+	);
 });
 
 // Runner ----------------------------------------------------------------------
 
 gulp.task('default', function(done) {
-	runSequence('clean', 'css', 'build:globals', 'uglify', 'build:amd', 'banner', 'clean:debug', 'clean:debug:globals', 'clean:debug:amd', done);
+	runSequence(
+		'clean',
+		'css',
+		'build:globals',
+		'uglify',
+		'build:amd',
+		'banner',
+		'clean:debug',
+		'clean:debug:globals',
+		'clean:debug:amd',
+		done,
+	);
 });
 
 gulp.task('server', ['default'], function() {
 	connect.server({
-		port: 8888
+		port: 8888,
 	});
 });

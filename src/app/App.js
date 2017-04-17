@@ -1,10 +1,10 @@
 'use strict';
 
-import { array, async, core } from 'metal';
+import {array, async, core} from 'metal';
 import debounce from 'metal-debounce';
 import dom from 'metal-dom';
 import CancellablePromise from 'metal-promise';
-import { EventEmitter, EventHandler } from 'metal-events';
+import {EventEmitter, EventHandler} from 'metal-events';
 import utils from '../utils/utils';
 import globals from '../globals/globals';
 import Route from '../route/Route';
@@ -13,7 +13,6 @@ import Surface from '../surface/Surface';
 import Uri from 'metal-uri';
 
 class App extends EventEmitter {
-
 	/**
 	 * App class that handle routes and screens lifecycle.
 	 * @constructor
@@ -82,7 +81,8 @@ class App extends EventEmitter {
 		 * @default form[enctype="multipart/form-data"]:not([data-senna-off])
 		 * @protected
 		 */
-		this.formSelector = 'form[enctype="multipart/form-data"]:not([data-senna-off])';
+		this.formSelector =
+			'form[enctype="multipart/form-data"]:not([data-senna-off])';
 
 		/**
 		 * When enabled, the route matching ignores query string from the path.
@@ -121,7 +121,8 @@ class App extends EventEmitter {
 		 * @type {boolean}
 		 * @protected
 		 */
-		this.nativeScrollRestorationSupported = ('scrollRestoration' in globals.window.history);
+		this.nativeScrollRestorationSupported =
+			'scrollRestoration' in globals.window.history;
 
 		/**
 		 * When set to true there is a pendingNavigate that has not yet been
@@ -212,9 +213,13 @@ class App extends EventEmitter {
 		this.appEventHandlers_ = new EventHandler();
 
 		this.appEventHandlers_.add(
-			dom.on(globals.window, 'scroll', debounce(this.onScroll_.bind(this), 100)),
+			dom.on(
+				globals.window,
+				'scroll',
+				debounce(this.onScroll_.bind(this), 100),
+			),
 			dom.on(globals.window, 'load', this.onLoad_.bind(this)),
-			dom.on(globals.window, 'popstate', this.onPopstate_.bind(this))
+			dom.on(globals.window, 'popstate', this.onPopstate_.bind(this)),
 		);
 
 		this.on('startNavigate', this.onStartNavigate_);
@@ -248,7 +253,7 @@ class App extends EventEmitter {
 		if (!Array.isArray(routes)) {
 			routes = [routes];
 		}
-		routes.forEach((route) => {
+		routes.forEach(route => {
 			if (!(route instanceof Route)) {
 				route = new Route(route.path, route.handler);
 			}
@@ -269,7 +274,7 @@ class App extends EventEmitter {
 		if (!Array.isArray(surfaces)) {
 			surfaces = [surfaces];
 		}
-		surfaces.forEach((surface) => {
+		surfaces.forEach(surface => {
 			if (core.isString(surface)) {
 				surface = new Surface(surface);
 			}
@@ -292,7 +297,7 @@ class App extends EventEmitter {
 			return false;
 		}
 		if (!this.isSameBasePath_(path)) {
-			console.log('Link clicked outside app\'s base path');
+			console.log("Link clicked outside app's base path");
 			return false;
 		}
 		// Prevents navigation if it's a hash change on the same url.
@@ -312,7 +317,7 @@ class App extends EventEmitter {
 	 * @chainable
 	 */
 	clearScreensCache() {
-		Object.keys(this.screens).forEach((path) => {
+		Object.keys(this.screens).forEach(path => {
 			if (path === this.activePath) {
 				this.activeScreen.clearCache();
 			} else {
@@ -335,7 +340,9 @@ class App extends EventEmitter {
 		var screen = this.screens[path];
 		if (!screen) {
 			var handler = route.getHandler();
-			if (handler === Screen || Screen.isImplementedBy(handler.prototype)) {
+			if (
+				handler === Screen || Screen.isImplementedBy(handler.prototype)
+			) {
 				screen = new handler();
 			} else {
 				screen = handler(route) || new Screen();
@@ -376,13 +383,21 @@ class App extends EventEmitter {
 	 */
 	doNavigate_(path, opt_replaceHistory) {
 		if (this.activeScreen && this.activeScreen.beforeDeactivate()) {
-			this.pendingNavigate = CancellablePromise.reject(new CancellablePromise.CancellationError('Cancelled by active screen'));
+			this.pendingNavigate = CancellablePromise.reject(
+				new CancellablePromise.CancellationError(
+					'Cancelled by active screen',
+				),
+			);
 			return this.pendingNavigate;
 		}
 
 		var route = this.findRoute(path);
 		if (!route) {
-			this.pendingNavigate = CancellablePromise.reject(new CancellablePromise.CancellationError('No route for ' + path));
+			this.pendingNavigate = CancellablePromise.reject(
+				new CancellablePromise.CancellationError(
+					'No route for ' + path,
+				),
+			);
 			return this.pendingNavigate;
 		}
 
@@ -393,16 +408,21 @@ class App extends EventEmitter {
 
 		var nextScreen = this.createScreenInstance(path, route);
 
-		return nextScreen.load(path)
+		return nextScreen
+			.load(path)
 			.then(() => {
 				if (this.activeScreen) {
 					this.activeScreen.deactivate();
 				}
-				this.prepareNavigateHistory_(path, nextScreen, opt_replaceHistory);
+				this.prepareNavigateHistory_(
+					path,
+					nextScreen,
+					opt_replaceHistory,
+				);
 				this.prepareNavigateSurfaces_(
 					nextScreen,
 					this.surfaces,
-					this.extractParams(route, path)
+					this.extractParams(route, path),
 				);
 			})
 			.then(() => nextScreen.evaluateStyles(this.surfaces))
@@ -411,7 +431,7 @@ class App extends EventEmitter {
 			.then(() => this.maybeUpdateScrollPositionState_())
 			.then(() => this.syncScrollPositionSyncThenAsync_())
 			.then(() => this.finalizeNavigate_(path, nextScreen))
-			.catch((reason) => {
+			.catch(reason => {
 				this.isNavigationPending = false;
 				this.handleNavigateError_(path, nextScreen, reason);
 				throw reason;
@@ -539,7 +559,9 @@ class App extends EventEmitter {
 	getRoutePath(path) {
 		if (this.getIgnoreQueryStringFromRoutePath()) {
 			path = utils.getUrlPathWithoutHashAndSearch(path);
-			return utils.getUrlPathWithoutHashAndSearch(path.substr(this.basePath.length));
+			return utils.getUrlPathWithoutHashAndSearch(
+				path.substr(this.basePath.length),
+			);
 		}
 
 		path = utils.getUrlPathWithoutHash(path);
@@ -565,7 +587,10 @@ class App extends EventEmitter {
 		console.log('Navigation error for [' + nextScreen + '] (' + err + ')');
 		if (!utils.isCurrentBrowserPath(path)) {
 			if (this.isNavigationPending && this.pendingNavigate) {
-				this.pendingNavigate.thenAlways(() => this.removeScreen(path), this);
+				this.pendingNavigate.thenAlways(
+					() => this.removeScreen(path),
+					this,
+				);
 			} else {
 				this.removeScreen(path);
 			}
@@ -622,14 +647,22 @@ class App extends EventEmitter {
 		// the winner.
 		var winner = false;
 		var switchScrollPositionRace = function() {
-			globals.document.removeEventListener('scroll', switchScrollPositionRace, false);
+			globals.document.removeEventListener(
+				'scroll',
+				switchScrollPositionRace,
+				false,
+			);
 			if (!winner) {
 				globals.window.scrollTo(state.scrollLeft, state.scrollTop);
 				winner = true;
 			}
 		};
 		async.nextTick(switchScrollPositionRace);
-		globals.document.addEventListener('scroll', switchScrollPositionRace, false);
+		globals.document.addEventListener(
+			'scroll',
+			switchScrollPositionRace,
+			false,
+		);
 	}
 
 	/**
@@ -638,7 +671,8 @@ class App extends EventEmitter {
 	 */
 	maybeDisableNativeScrollRestoration() {
 		if (this.nativeScrollRestorationSupported) {
-			this.nativeScrollRestoration_ = globals.window.history.scrollRestoration;
+			this.nativeScrollRestoration_ =
+				globals.window.history.scrollRestoration;
 			globals.window.history.scrollRestoration = 'manual';
 		}
 	}
@@ -675,9 +709,14 @@ class App extends EventEmitter {
 	maybeRepositionScrollToHashedAnchor() {
 		var hash = globals.window.location.hash;
 		if (hash) {
-			var anchorElement = globals.document.getElementById(hash.substring(1));
+			var anchorElement = globals.document.getElementById(
+				hash.substring(1),
+			);
 			if (anchorElement) {
-				globals.window.scrollTo(anchorElement.offsetLeft, anchorElement.offsetTop);
+				globals.window.scrollTo(
+					anchorElement.offsetLeft,
+					anchorElement.offsetTop,
+				);
 			}
 		}
 	}
@@ -687,7 +726,10 @@ class App extends EventEmitter {
 	 * value captured by `maybeDisableNativeScrollRestoration`.
 	 */
 	maybeRestoreNativeScrollRestoration() {
-		if (this.nativeScrollRestorationSupported && this.nativeScrollRestoration_) {
+		if (
+			this.nativeScrollRestorationSupported &&
+			this.nativeScrollRestoration_
+		) {
 			globals.window.history.scrollRestoration = this.nativeScrollRestoration_;
 		}
 	}
@@ -715,7 +757,10 @@ class App extends EventEmitter {
 		var hash = globals.window.location.hash;
 		var anchorElement = globals.document.getElementById(hash.substring(1));
 		if (anchorElement) {
-			this.saveHistoryCurrentPageScrollPosition_(anchorElement.offsetTop, anchorElement.offsetLeft);
+			this.saveHistoryCurrentPageScrollPosition_(
+				anchorElement.offsetTop,
+				anchorElement.offsetLeft,
+			);
 		}
 	}
 
@@ -728,7 +773,9 @@ class App extends EventEmitter {
 	 */
 	navigate(path, opt_replaceHistory, opt_event) {
 		if (!utils.isHtml5HistorySupported()) {
-			throw new Error('HTML5 History is not supported. Senna will not intercept navigation.');
+			throw new Error(
+				'HTML5 History is not supported. Senna will not intercept navigation.',
+			);
 		}
 
 		// When reloading the same path do replaceState instead of pushState to
@@ -740,7 +787,7 @@ class App extends EventEmitter {
 		this.emit('beforeNavigate', {
 			event: opt_event,
 			path: path,
-			replaceHistory: !!opt_replaceHistory
+			replaceHistory: !!opt_replaceHistory,
 		});
 
 		return this.pendingNavigate;
@@ -775,7 +822,7 @@ class App extends EventEmitter {
 		this.emit('startNavigate', {
 			form: event.form,
 			path: event.path,
-			replaceHistory: event.replaceHistory
+			replaceHistory: event.replaceHistory,
 		});
 	}
 
@@ -786,8 +833,16 @@ class App extends EventEmitter {
 	 * @protected
 	 */
 	onDocClickDelegate_(event) {
-		if (event.altKey || event.ctrlKey || event.metaKey || event.shiftKey || event.button) {
-			console.log('Navigate aborted, invalid mouse button or modifier key pressed.');
+		if (
+			event.altKey ||
+			event.ctrlKey ||
+			event.metaKey ||
+			event.shiftKey ||
+			event.button
+		) {
+			console.log(
+				'Navigate aborted, invalid mouse button or modifier key pressed.',
+			);
 			return;
 		}
 		this.maybeNavigate_(event.delegateTarget.href, event);
@@ -806,11 +861,14 @@ class App extends EventEmitter {
 			return;
 		}
 		event.capturedFormElement = form;
-		const buttonSelector = 'button:not([type]),button[type=submit],input[type=submit]';
+		const buttonSelector =
+			'button:not([type]),button[type=submit],input[type=submit]';
 		if (dom.match(globals.document.activeElement, buttonSelector)) {
 			event.capturedFormButtonElement = globals.document.activeElement;
 		} else {
-			event.capturedFormButtonElement = form.querySelector(buttonSelector);
+			event.capturedFormButtonElement = form.querySelector(
+				buttonSelector,
+			);
 		}
 		this.maybeNavigate_(form.action, event);
 	}
@@ -860,7 +918,10 @@ class App extends EventEmitter {
 				// to a different url, reload the browser. This behavior doesn't
 				// require senna to route hashed links and is closer to native
 				// browser behavior.
-				if (this.redirectPath && !utils.isCurrentBrowserPath(this.redirectPath)) {
+				if (
+					this.redirectPath &&
+					!utils.isCurrentBrowserPath(this.redirectPath)
+				) {
 					this.reloadPage();
 				}
 				// Always try to reposition scroll to the hashed anchor when
@@ -890,7 +951,10 @@ class App extends EventEmitter {
 	 */
 	onScroll_() {
 		if (this.captureScrollPositionFromScrollEvent) {
-			this.saveHistoryCurrentPageScrollPosition_(globals.window.pageYOffset, globals.window.pageXOffset);
+			this.saveHistoryCurrentPageScrollPosition_(
+				globals.window.pageYOffset,
+				globals.window.pageXOffset,
+			);
 		}
 	}
 
@@ -907,17 +971,23 @@ class App extends EventEmitter {
 
 		var endNavigatePayload = {
 			form: event.form,
-			path: event.path
+			path: event.path,
 		};
 
-		this.pendingNavigate = this.doNavigate_(event.path, event.replaceHistory)
-			.catch((reason) => {
+		this.pendingNavigate = this.doNavigate_(
+			event.path,
+			event.replaceHistory,
+		)
+			.catch(reason => {
 				endNavigatePayload.error = reason;
 				throw reason;
 			})
 			.thenAlways(() => {
 				if (!this.pendingNavigate) {
-					dom.removeClasses(globals.document.documentElement, this.loadingCssClass);
+					dom.removeClasses(
+						globals.document.documentElement,
+						this.loadingCssClass,
+					);
 					this.maybeRestoreNativeScrollRestoration();
 					this.captureScrollPositionFromScrollEvent = true;
 				}
@@ -935,16 +1005,21 @@ class App extends EventEmitter {
 	prefetch(path) {
 		var route = this.findRoute(path);
 		if (!route) {
-			return CancellablePromise.reject(new CancellablePromise.CancellationError('No route for ' + path));
+			return CancellablePromise.reject(
+				new CancellablePromise.CancellationError(
+					'No route for ' + path,
+				),
+			);
 		}
 
 		console.log('Prefetching [' + path + ']');
 
 		var nextScreen = this.createScreenInstance(path, route);
 
-		return nextScreen.load(path)
+		return nextScreen
+			.load(path)
 			.then(() => this.screens[path] = nextScreen)
-			.catch((reason) => {
+			.catch(reason => {
 				this.handleNavigateError_(path, nextScreen, reason);
 				throw reason;
 			});
@@ -968,15 +1043,24 @@ class App extends EventEmitter {
 			redirectPath,
 			scrollLeft: 0,
 			scrollTop: 0,
-			senna: true
+			senna: true,
 		};
 		if (opt_replaceHistory) {
 			historyState.scrollTop = this.popstateScrollTop;
 			historyState.scrollLeft = this.popstateScrollLeft;
 		}
 		const hash = new Uri(path).getHash();
-		redirectPath = this.maybeRestoreRedirectPathHash_(path, redirectPath, hash);
-		this.updateHistory_(title, redirectPath, nextScreen.beforeUpdateHistoryState(historyState), opt_replaceHistory);
+		redirectPath = this.maybeRestoreRedirectPathHash_(
+			path,
+			redirectPath,
+			hash,
+		);
+		this.updateHistory_(
+			title,
+			redirectPath,
+			nextScreen.beforeUpdateHistoryState(historyState),
+			opt_replaceHistory,
+		);
 		this.redirectPath = redirectPath;
 	}
 
@@ -987,11 +1071,19 @@ class App extends EventEmitter {
 	 * @param {!Object} params Params extracted from the current path.
 	 */
 	prepareNavigateSurfaces_(nextScreen, surfaces, params) {
-		Object.keys(surfaces).forEach((id) => {
+		Object.keys(surfaces).forEach(id => {
 			var surfaceContent = nextScreen.getSurfaceContent(id, params);
 			surfaces[id].addContent(nextScreen.getId(), surfaceContent);
-			console.log('Screen [' + nextScreen.getId() + '] add content to surface ' +
-				'[' + surfaces[id] + '] [' + (core.isDefAndNotNull(surfaceContent) ? '...' : 'empty') + ']');
+			console.log(
+				'Screen [' +
+					nextScreen.getId() +
+					'] add content to surface ' +
+					'[' +
+					surfaces[id] +
+					'] [' +
+					(core.isDefAndNotNull(surfaceContent) ? '...' : 'empty') +
+					']',
+			);
 		});
 	}
 
@@ -1018,7 +1110,9 @@ class App extends EventEmitter {
 	removeScreen(path) {
 		var screen = this.screens[path];
 		if (screen) {
-			Object.keys(this.surfaces).forEach((surfaceId) => this.surfaces[surfaceId].remove(screen.getId()));
+			Object.keys(this.surfaces).forEach(surfaceId =>
+				this.surfaces[surfaceId].remove(screen.getId()),
+			);
 			screen.dispose();
 			delete this.screens[path];
 		}
@@ -1070,7 +1164,13 @@ class App extends EventEmitter {
 		if (this.formEventHandler_) {
 			this.formEventHandler_.removeListener();
 		}
-		this.formEventHandler_ = dom.delegate(document, 'submit', this.formSelector, this.onDocSubmitDelegate_.bind(this), this.allowPreventNavigate);
+		this.formEventHandler_ = dom.delegate(
+			document,
+			'submit',
+			this.formSelector,
+			this.onDocSubmitDelegate_.bind(this),
+			this.allowPreventNavigate,
+		);
 	}
 
 	/**
@@ -1090,7 +1190,13 @@ class App extends EventEmitter {
 		if (this.linkEventHandler_) {
 			this.linkEventHandler_.removeListener();
 		}
-		this.linkEventHandler_ = dom.delegate(document, 'click', this.linkSelector, this.onDocClickDelegate_.bind(this), this.allowPreventNavigate);
+		this.linkEventHandler_ = dom.delegate(
+			document,
+			'click',
+			this.linkSelector,
+			this.onDocClickDelegate_.bind(this),
+			this.allowPreventNavigate,
+		);
 	}
 
 	/**
@@ -1142,7 +1248,9 @@ class App extends EventEmitter {
 			}
 		};
 
-		return new CancellablePromise((resolve) => sync() & async.nextTick(() => sync() & resolve()));
+		return new CancellablePromise(
+			resolve => sync() & async.nextTick(() => sync() & resolve()),
+		);
 	}
 
 	/**
@@ -1167,7 +1275,6 @@ class App extends EventEmitter {
 			globals.document.title = title;
 		}
 	}
-
 }
 
 export default App;

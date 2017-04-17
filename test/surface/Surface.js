@@ -1,12 +1,11 @@
 'use strict';
 
-import { core } from 'metal';
+import {core} from 'metal';
 import dom from 'metal-dom';
 import Surface from '../../src/surface/Surface';
 import CancellablePromise from 'metal-promise';
 
 describe('Surface', function() {
-
 	describe('Constructor', () => {
 		it('should throws error when surface id not specified', () => {
 			assert.throws(() => {
@@ -99,7 +98,10 @@ describe('Surface', function() {
 			var surface = new Surface('surfaceId');
 			var surfaceChild = surface.addContent('screenId', 'content');
 			surface.show('screenId');
-			var surfaceChildNext = surface.addContent('screenNextId', 'content');
+			var surfaceChildNext = surface.addContent(
+				'screenNextId',
+				'content',
+			);
 			assert.strictEqual('none', surfaceChildNext.style.display);
 			surface.show('screenNextId');
 			assert.strictEqual('none', surfaceChild.style.display);
@@ -159,7 +161,9 @@ describe('Surface', function() {
 		});
 
 		it('should remove surface child content if already in document', () => {
-			var surfaceChild = enterDocumentSurfaceElement('surfaceId-screenId');
+			var surfaceChild = enterDocumentSurfaceElement(
+				'surfaceId-screenId',
+			);
 			enterDocumentSurfaceElement('surfaceId').appendChild(surfaceChild);
 			surfaceChild.innerHTML = 'temp';
 			var surface = new Surface('surfaceId');
@@ -180,11 +184,14 @@ describe('Surface', function() {
 			exitDocumentSurfaceElement('surfaceId');
 		});
 
-		it('should be able to wait deferred transition before removing visible surface child', (done) => {
+		it('should be able to wait deferred transition before removing visible surface child', done => {
 			enterDocumentSurfaceElement('surfaceId');
 			var surface = new Surface('surfaceId');
 			var surfaceChild = surface.addContent('screenId', 'content');
-			var surfaceChildNext = surface.addContent('screenNextId', 'content');
+			var surfaceChildNext = surface.addContent(
+				'screenNextId',
+				'content',
+			);
 			var transitionFn = () => CancellablePromise.resolve();
 			surface.setTransitionFn(transitionFn);
 			surface.show('screenId');
@@ -198,18 +205,23 @@ describe('Surface', function() {
 			exitDocumentSurfaceElement('surfaceId');
 		});
 
-		it('should transition deferred be cancellable', (done) => {
+		it('should transition deferred be cancellable', done => {
 			var surface = new Surface('surfaceId');
 			var transitionFn = () => CancellablePromise.resolve();
 			surface.setTransitionFn(transitionFn);
 			surface.transition(null, null).catch(() => done()).cancel();
 		});
 	});
-
 });
 
 function enterDocumentSurfaceElement(surfaceId, opt_content) {
-	dom.enterDocument('<div id="' + surfaceId + '">' + (opt_content ? opt_content : '') + '</div>');
+	dom.enterDocument(
+		'<div id="' +
+			surfaceId +
+			'">' +
+			(opt_content ? opt_content : '') +
+			'</div>',
+	);
 	return document.getElementById(surfaceId);
 }
 

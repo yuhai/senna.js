@@ -1,8 +1,8 @@
 'use strict';
 
-import { core } from 'metal';
+import {core} from 'metal';
 import Ajax from 'metal-ajax';
-import { MultiMap } from 'metal-structs';
+import {MultiMap} from 'metal-structs';
 import CancellablePromise from 'metal-promise';
 import errors from '../errors/errors';
 import utils from '../utils/utils';
@@ -12,7 +12,6 @@ import Uri from 'metal-uri';
 import UA from 'metal-useragent';
 
 class RequestScreen extends Screen {
-
 	/**
 	 * Request screen abstract class to perform io operations on descendant
 	 * screens.
@@ -39,7 +38,7 @@ class RequestScreen extends Screen {
 		 */
 		this.httpHeaders = {
 			'X-PJAX': 'true',
-			'X-Requested-With': 'XMLHttpRequest'
+			'X-Requested-With': 'XMLHttpRequest',
 		};
 
 		/**
@@ -200,7 +199,9 @@ class RequestScreen extends Screen {
 		let body = null;
 		let httpMethod = this.httpMethod;
 		const headers = new MultiMap();
-		Object.keys(this.httpHeaders).forEach(header => headers.add(header, this.httpHeaders[header]));
+		Object.keys(this.httpHeaders).forEach(header =>
+			headers.add(header, this.httpHeaders[header]),
+		);
 		if (globals.capturedFormElement) {
 			body = new FormData(globals.capturedFormElement);
 			this.maybeAppendSubmitButtonValue(body);
@@ -210,8 +211,14 @@ class RequestScreen extends Screen {
 			}
 		}
 		const requestPath = this.formatLoadPath(path);
-		return Ajax
-			.request(requestPath, httpMethod, body, headers, null, this.timeout)
+		return Ajax.request(
+			requestPath,
+			httpMethod,
+			body,
+			headers,
+			null,
+			this.timeout,
+		)
 			.then(xhr => {
 				this.setRequest(xhr);
 				this.assertValidResponseStatusCode(xhr.status);
@@ -221,7 +228,7 @@ class RequestScreen extends Screen {
 				xhr.requestPath = requestPath;
 				return xhr.responseText;
 			})
-			.catch((reason) => {
+			.catch(reason => {
 				switch (reason.message) {
 					case errors.REQUEST_TIMEOUT:
 						reason.timeout = true;
@@ -296,7 +303,6 @@ class RequestScreen extends Screen {
 	setTimeout(timeout) {
 		this.timeout = timeout;
 	}
-
 }
 
 /**

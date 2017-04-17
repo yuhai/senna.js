@@ -1,10 +1,9 @@
 'use strict';
 
-import { core } from 'metal';
+import {core} from 'metal';
 import Route from '../../src/route/Route';
 
 describe('Route', function() {
-
 	describe('Constructor', () => {
 		it('should throws error when path and handler not specified', () => {
 			assert.throws(() => {
@@ -88,17 +87,23 @@ describe('Route', function() {
 
 	describe('Extracting params', function() {
 		it('should extract params from path matching route', () => {
-			var route = new Route('/path/:foo(\\d+)/:bar(\\w+)', core.nullFunction);
+			var route = new Route(
+				'/path/:foo(\\d+)/:bar(\\w+)',
+				core.nullFunction,
+			);
 			var params = route.extractParams('/path/123/abc');
 			var expected = {
 				foo: '123',
-				bar: 'abc'
+				bar: 'abc',
 			};
 			assert.deepEqual(expected, params);
 		});
 
 		it('should return null if try to extract params from non matching route', () => {
-			var route = new Route('/path/:foo(\\d+)/:bar(\\w+)', core.nullFunction);
+			var route = new Route(
+				'/path/:foo(\\d+)/:bar(\\w+)',
+				core.nullFunction,
+			);
 			var params = route.extractParams('/path/abc/123');
 			assert.strictEqual(null, params);
 		});

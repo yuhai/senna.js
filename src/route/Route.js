@@ -1,10 +1,9 @@
 'use strict';
 
-import { core } from 'metal';
-import { extractData, parse, toRegex } from 'metal-path-parser';
+import {core} from 'metal';
+import {extractData, parse, toRegex} from 'metal-path-parser';
 
 class Route {
-
 	/**
 	 * Route class.
 	 * @param {!string|RegExp|Function} path
@@ -46,7 +45,7 @@ class Route {
 			var regex = toRegex(tokens);
 			this.parsedData_ = {
 				regex,
-				tokens
+				tokens,
 			};
 		}
 		return this.parsedData_;
@@ -101,7 +100,6 @@ class Route {
 
 		return false;
 	}
-
 }
 
 export default Route;

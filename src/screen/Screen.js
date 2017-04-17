@@ -1,12 +1,11 @@
 'use strict';
 
-import { core } from 'metal';
-import { globalEval } from 'metal-dom';
+import {core} from 'metal';
+import {globalEval} from 'metal-dom';
 import Cacheable from '../cacheable/Cacheable';
 import CancellablePromise from 'metal-promise';
 
 class Screen extends Cacheable {
-
 	/**
 	 * Screen class is a special type of route handler that provides helper
 	 * utilities that adds lifecycle and methods to provide content to each
@@ -215,7 +214,6 @@ class Screen extends Cacheable {
 	toString() {
 		return this.id;
 	}
-
 }
 
 /**

@@ -1,12 +1,11 @@
 'use strict';
 
 import globals from '../globals/globals';
-import { core, Disposable } from 'metal';
+import {core, Disposable} from 'metal';
 import dom from 'metal-dom';
 import CancellablePromise from 'metal-promise';
 
 class Surface extends Disposable {
-
 	/**
 	 * Surface class representing the references to elements on the page that
 	 * can potentially be updated by <code>App</code>.
@@ -17,7 +16,9 @@ class Surface extends Disposable {
 		super();
 
 		if (!id) {
-			throw new Error('Surface element id not specified. A surface element requires a valid id.');
+			throw new Error(
+				'Surface element id not specified. A surface element requires a valid id.',
+			);
 		}
 
 		/**
@@ -243,7 +244,6 @@ class Surface extends Disposable {
 		var transitionFn = this.transitionFn || Surface.defaultTransition;
 		return CancellablePromise.resolve(transitionFn.call(this, from, to));
 	}
-
 }
 
 /**

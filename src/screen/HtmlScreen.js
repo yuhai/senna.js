@@ -1,7 +1,7 @@
 'use strict';
 
-import { core } from 'metal';
-import { dom, globalEval, globalEvalStyles } from 'metal-dom';
+import {core} from 'metal';
+import {dom, globalEval, globalEvalStyles} from 'metal-dom';
 import CancellablePromise from 'metal-promise';
 import globals from '../globals/globals';
 import RequestScreen from './RequestScreen';
@@ -11,7 +11,6 @@ import Uri from 'metal-uri';
 import utils from '../utils/utils';
 
 class HtmlScreen extends RequestScreen {
-
 	/**
 	 * Screen class that perform a request and extracts surface contents from
 	 * the response content.
@@ -62,14 +61,20 @@ class HtmlScreen extends RequestScreen {
 	 * @param {Element} newStyle
 	 */
 	appendStyleIntoDocument_(newStyle) {
-		var isTemporaryStyle = dom.match(newStyle, HtmlScreen.selectors.stylesTemporary);
+		var isTemporaryStyle = dom.match(
+			newStyle,
+			HtmlScreen.selectors.stylesTemporary,
+		);
 		if (isTemporaryStyle) {
 			this.pendingStyles.push(newStyle);
 		}
 		if (newStyle.id) {
 			var styleInDoc = globals.document.getElementById(newStyle.id);
 			if (styleInDoc) {
-				styleInDoc.parentNode.insertBefore(newStyle, styleInDoc.nextSibling);
+				styleInDoc.parentNode.insertBefore(
+					newStyle,
+					styleInDoc.nextSibling,
+				);
 				return;
 			}
 		}
@@ -117,7 +122,7 @@ class HtmlScreen extends RequestScreen {
 	 */
 	disposePendingStyles() {
 		if (this.pendingStyles) {
-			this.pendingStyles.forEach((style) => dom.exitDocument(style));
+			this.pendingStyles.forEach(style => dom.exitDocument(style));
 		}
 	}
 
@@ -126,10 +131,15 @@ class HtmlScreen extends RequestScreen {
 	 */
 	evaluateScripts(surfaces) {
 		var evaluateTrackedScripts = this.evaluateTrackedResources_(
-			globalEval.runScriptsInElement, HtmlScreen.selectors.scripts,
-			HtmlScreen.selectors.scriptsTemporary, HtmlScreen.selectors.scriptsPermanent);
+			globalEval.runScriptsInElement,
+			HtmlScreen.selectors.scripts,
+			HtmlScreen.selectors.scriptsTemporary,
+			HtmlScreen.selectors.scriptsPermanent,
+		);
 
-		return evaluateTrackedScripts.then(() => super.evaluateScripts(surfaces));
+		return evaluateTrackedScripts.then(() =>
+			super.evaluateScripts(surfaces),
+		);
 	}
 
 	/**
@@ -138,9 +148,12 @@ class HtmlScreen extends RequestScreen {
 	evaluateStyles(surfaces) {
 		this.pendingStyles = [];
 		var evaluateTrackedStyles = this.evaluateTrackedResources_(
-			globalEvalStyles.runStylesInElement, HtmlScreen.selectors.styles,
-			HtmlScreen.selectors.stylesTemporary, HtmlScreen.selectors.stylesPermanent,
-			this.appendStyleIntoDocument_.bind(this));
+			globalEvalStyles.runStylesInElement,
+			HtmlScreen.selectors.styles,
+			HtmlScreen.selectors.stylesTemporary,
+			HtmlScreen.selectors.stylesPermanent,
+			this.appendStyleIntoDocument_.bind(this),
+		);
 
 		return evaluateTrackedStyles.then(() => super.evaluateStyles(surfaces));
 	}
@@ -160,13 +173,19 @@ class HtmlScreen extends RequestScreen {
 	 *     complete.
 	 * @private
 	 */
-	evaluateTrackedResources_(evaluatorFn, selector, selectorTemporary, selectorPermanent, opt_appendResourceFn) {
+	evaluateTrackedResources_(
+		evaluatorFn,
+		selector,
+		selectorTemporary,
+		selectorPermanent,
+		opt_appendResourceFn,
+	) {
 		var tracked = this.virtualQuerySelectorAll_(selector);
 		var temporariesInDoc = this.querySelectorAll_(selectorTemporary);
 		var permanentsInDoc = this.querySelectorAll_(selectorPermanent);
 
 		// Adds permanent resources in document to cache.
-		permanentsInDoc.forEach((resource) => {
+		permanentsInDoc.forEach(resource => {
 			var resourceKey = this.getResourceKey_(resource);
 			if (resourceKey) {
 				HtmlScreen.permanentResourcesInDoc[resourceKey] = true;
@@ -174,7 +193,7 @@ class HtmlScreen extends RequestScreen {
 		});
 
 		var frag = dom.buildFragment();
-		tracked.forEach((resource) => {
+		tracked.forEach(resource => {
 			var resourceKey = this.getResourceKey_(resource);
 			// Do not load permanent resources if already in document.
 			if (!HtmlScreen.permanentResourcesInDoc[resourceKey]) {
@@ -186,11 +205,17 @@ class HtmlScreen extends RequestScreen {
 			}
 		});
 
-		return new CancellablePromise((resolve) => {
-			evaluatorFn(frag, () => {
-				temporariesInDoc.forEach((resource) => dom.exitDocument(resource));
-				resolve();
-			}, opt_appendResourceFn);
+		return new CancellablePromise(resolve => {
+			evaluatorFn(
+				frag,
+				() => {
+					temporariesInDoc.forEach(resource =>
+						dom.exitDocument(resource),
+					);
+					resolve();
+				},
+				opt_appendResourceFn,
+			);
 		});
 	}
 
@@ -200,7 +225,10 @@ class HtmlScreen extends RequestScreen {
 	flip(surfaces) {
 		return super.flip(surfaces).then(() => {
 			utils.clearNodeAttributes(document.documentElement);
-			utils.copyNodeAttributes(this.virtualDocument, document.documentElement);
+			utils.copyNodeAttributes(
+				this.virtualDocument,
+				document.documentElement,
+			);
 		});
 	}
 
@@ -220,7 +248,9 @@ class HtmlScreen extends RequestScreen {
 	getSurfaceContent(surfaceId) {
 		var surface = this.virtualDocument.querySelector('#' + surfaceId);
 		if (surface) {
-			var defaultChild = surface.querySelector('#' + surfaceId + '-' + Surface.DEFAULT);
+			var defaultChild = surface.querySelector(
+				'#' + surfaceId + '-' + Surface.DEFAULT,
+			);
 			if (defaultChild) {
 				return defaultChild.innerHTML;
 			}
@@ -240,16 +270,15 @@ class HtmlScreen extends RequestScreen {
 	 * @inheritDoc
 	 */
 	load(path) {
-		return super.load(path)
-			.then(content => {
-				this.allocateVirtualDocumentForContent(content);
-				this.resolveTitleFromVirtualDocument();
-				this.assertSameBodyIdInVirtualDocument();
-				if (UA.isIe) {
-					this.makeTemporaryStylesHrefsUnique_();
-				}
-				return content;
-			});
+		return super.load(path).then(content => {
+			this.allocateVirtualDocumentForContent(content);
+			this.resolveTitleFromVirtualDocument();
+			this.assertSameBodyIdInVirtualDocument();
+			if (UA.isIe) {
+				this.makeTemporaryStylesHrefsUnique_();
+			}
+			return content;
+		});
 	}
 
 	/**
@@ -258,8 +287,12 @@ class HtmlScreen extends RequestScreen {
 	 * IE11. https://developer.microsoft.com/en-us/microsoft-edge/platform/issues/7940171/
 	 */
 	makeTemporaryStylesHrefsUnique_() {
-		var temporariesInDoc = this.virtualQuerySelectorAll_(HtmlScreen.selectors.stylesTemporary);
-		temporariesInDoc.forEach((style) => this.replaceStyleAndMakeUnique_(style));
+		var temporariesInDoc = this.virtualQuerySelectorAll_(
+			HtmlScreen.selectors.stylesTemporary,
+		);
+		temporariesInDoc.forEach(style =>
+			this.replaceStyleAndMakeUnique_(style),
+		);
 	}
 
 	/**
@@ -282,7 +315,9 @@ class HtmlScreen extends RequestScreen {
 	 * @return {array.<Element>}
 	 */
 	virtualQuerySelectorAll_(selector) {
-		return Array.prototype.slice.call(this.virtualDocument.querySelectorAll(selector));
+		return Array.prototype.slice.call(
+			this.virtualDocument.querySelectorAll(selector),
+		);
 	}
 
 	/**
@@ -291,7 +326,9 @@ class HtmlScreen extends RequestScreen {
 	 * @return {array.<Element>}
 	 */
 	querySelectorAll_(selector) {
-		return Array.prototype.slice.call(globals.document.querySelectorAll(selector));
+		return Array.prototype.slice.call(
+			globals.document.querySelectorAll(selector),
+		);
 	}
 
 	/**
@@ -318,7 +355,6 @@ class HtmlScreen extends RequestScreen {
 	setTitleSelector(titleSelector) {
 		this.titleSelector = titleSelector;
 	}
-
 }
 
 /**
@@ -333,7 +369,7 @@ HtmlScreen.selectors = {
 	scriptsTemporary: 'script[data-senna-track="temporary"]',
 	styles: 'style[data-senna-track],link[data-senna-track]',
 	stylesPermanent: 'style[data-senna-track="permanent"],link[data-senna-track="permanent"]',
-	stylesTemporary: 'style[data-senna-track="temporary"],link[data-senna-track="temporary"]'
+	stylesTemporary: 'style[data-senna-track="temporary"],link[data-senna-track="temporary"]',
 };
 
 /**
