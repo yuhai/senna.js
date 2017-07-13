@@ -189,7 +189,7 @@ define(['exports', 'metal-dom/src/all/dom', 'metal/src/metal', 'metal-events/src
     * @default a:not([data-senna-off])
     * @protected
     */
-			_this.linkSelector = 'a:not([data-senna-off])';
+			_this.linkSelector = 'a:not([data-senna-off]):not([target="_blank"])';
 
 			/**
     * Holds the loading css class.
@@ -677,7 +677,15 @@ define(['exports', 'metal-dom/src/all/dom', 'metal/src/metal', 'metal-events/src
 				if (hash) {
 					var anchorElement = _globals2.default.document.getElementById(hash.substring(1));
 					if (anchorElement) {
-						_globals2.default.window.scrollTo(anchorElement.offsetLeft, anchorElement.offsetTop);
+						var offsetLeft = 0,
+						    offsetTop = 0;
+
+						do {
+							offsetLeft += anchorElement.offsetLeft;
+							offsetTop += anchorElement.offsetTop;
+							anchorElement = anchorElement.offsetParent;
+						} while (anchorElement);
+						_globals2.default.window.scrollTo(offsetLeft, offsetTop);
 					}
 				}
 			}
@@ -702,7 +710,18 @@ define(['exports', 'metal-dom/src/all/dom', 'metal/src/metal', 'metal-events/src
 				var hash = _globals2.default.window.location.hash;
 				var anchorElement = _globals2.default.document.getElementById(hash.substring(1));
 				if (anchorElement) {
-					this.saveHistoryCurrentPageScrollPosition_(anchorElement.offsetTop, anchorElement.offsetLeft);
+					var anchorElementAbsoluteOffsetLeft = anchorElement.offsetLeft;
+					var anchorElementAbsoluteOffsetTop = anchorElement.offsetTop;
+					while (anchorElement.offsetParent) {
+						if (anchorElement == _globals2.default.document.getElementsByTagName('body')[0]) {
+							break;
+						} else {
+							anchorElementAbsoluteOffsetLeft = anchorElementAbsoluteOffsetLeft + anchorElement.offsetParent.offsetLeft;
+							anchorElementAbsoluteOffsetTop = anchorElementAbsoluteOffsetTop + anchorElement.offsetParent.offsetTop;
+							anchorElement = anchorElement.offsetParent;
+						}
+					}
+					this.saveHistoryCurrentPageScrollPosition_(anchorElementAbsoluteOffsetTop, anchorElementAbsoluteOffsetLeft);
 				}
 			}
 		}, {

@@ -682,13 +682,7 @@ class App extends EventEmitter {
 		if (hash) {
 			let anchorElement = globals.document.getElementById(hash.substring(1));
 			if (anchorElement) {
-				let [offsetLeft, offsetTop] = [0, 0];
-				do {
-					offsetLeft += anchorElement.offsetLeft;
-					offsetTop += anchorElement.offsetTop;
-					anchorElement = anchorElement.offsetParent;
-				}
-				while (anchorElement);
+				const {offsetLeft, offsetTop} = utils.getNodeOffset(anchorElement);
 				globals.window.scrollTo(offsetLeft, offsetTop);
 			}
 		}
@@ -727,19 +721,8 @@ class App extends EventEmitter {
 		var hash = globals.window.location.hash;
 		var anchorElement = globals.document.getElementById(hash.substring(1));
 		if (anchorElement) {
-			var anchorElementAbsoluteOffsetLeft = anchorElement.offsetLeft;
-			var anchorElementAbsoluteOffsetTop = anchorElement.offsetTop;
-			while (anchorElement.offsetParent) {
-				if (anchorElement == globals.document.getElementsByTagName('body')[0]) {
-					break;
-				}
-				else {
-					anchorElementAbsoluteOffsetLeft = anchorElementAbsoluteOffsetLeft + anchorElement.offsetParent.offsetLeft;
-					anchorElementAbsoluteOffsetTop = anchorElementAbsoluteOffsetTop + anchorElement.offsetParent.offsetTop;
-					anchorElement = anchorElement.offsetParent;
-				}
-			}
-			this.saveHistoryCurrentPageScrollPosition_(anchorElementAbsoluteOffsetTop, anchorElementAbsoluteOffsetLeft);
+			const {offsetLeft, offsetTop} = utils.getNodeOffset(anchorElement);
+			this.saveHistoryCurrentPageScrollPosition_(offsetTop, offsetLeft);
 		}
 	}
 

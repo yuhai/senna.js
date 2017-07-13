@@ -1,6 +1,5 @@
 'use strict';
 
-import { async } from 'metal';
 import { dom } from 'metal-dom';
 import CancellablePromise from 'metal-promise';
 import globals from '../../src/globals/globals';
@@ -1588,7 +1587,7 @@ describe('App', function() {
 				this.cacheable = true;
 			}
 
-			load(path) {
+			load() {
 				return new CancellablePromise(resolve => setTimeout(resolve, 100));
 			}
 		}
@@ -1621,7 +1620,7 @@ describe('App', function() {
 					}
 				});
 				globals.window.history.go(-1);
-				setTimeout(() => globals.window.history.go(-1) , 50);
+				setTimeout(() => globals.window.history.go(-1), 50);
 			});
 	});
 
@@ -1632,23 +1631,18 @@ describe('App', function() {
 		}
 
 		showPageScrollbar();
-		var link = enterDocumentLinkElement('/path2');
-		link.style.position = 'absolute';
-		link.style.top = '1000px';
-		link.style.left = '1000px';
+		const parentNode = dom.enterDocument('<div style="position:absolute;top:400px;"><div id="surfaceId1" style="position:relative;top:400px"></div></div>');
 		this.app = new App();
 		this.app.addRoutes(new Route('/path1', Screen));
-		this.app.addRoutes(new Route('/path2', Screen));
-		this.app.navigate('/path1').then(() => {
-			this.app.on('endNavigate', () => {
-				assert.strictEqual(1000, window.pageXOffset);
-				assert.strictEqual(1000, window.pageYOffset);
-
-				hidePageScrollbar();
-				exitDocumentLinkElement();
-				done();
-			});
-			this.app.navigate('/path2#link');
+		this.app.addSurfaces(['surfaceId1']);
+		this.app.navigate('/path1#surfaceId1').then(() => {
+			const surfaceNode = document.querySelector('#surfaceId1');
+			const {offsetLeft, offsetTop} = utils.getNodeOffset(surfaceNode);
+			assert.strictEqual(globals.window.scrollY, offsetTop);
+			assert.strictEqual(globals.window.scrollX, offsetLeft);
+			hidePageScrollbar();
+			dom.exitDocument(parentNode);
+			done();
 		});
 	});
 

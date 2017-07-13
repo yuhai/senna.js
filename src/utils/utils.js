@@ -37,6 +37,24 @@ class utils {
 	}
 
 	/**
+	 * Gets the given node offset coordinates.
+	 * @return {!object}
+	 * @static
+	 */
+	static getNodeOffset(node) {
+		let [offsetLeft, offsetTop] = [0, 0];
+		do {
+			offsetLeft += node.offsetLeft;
+			offsetTop += node.offsetTop;
+			node = node.offsetParent;
+		} while (node);
+		return {
+			offsetLeft,
+			offsetTop
+		};
+	}
+
+	/**
 	 * Extracts the path part of an url.
 	 * @return {!string}
 	 * @static
@@ -100,8 +118,7 @@ class utils {
 	static isWebUri(url) {
 		try {
 			return new Uri(url);
-		}
-		catch (err) {
+		} catch (err) {
 			console.error(`${err.message} ${url}`);
 			return false;
 		}
@@ -116,18 +133,18 @@ class utils {
 		Array.prototype.slice.call(node.attributes).forEach((attribute) => node.removeAttribute(attribute.name));
 	}
 
-  /**
-  * Removes trailing slash in path.
-  * @param {!string}
-  * @return {string}
-  */
-  static removePathTrailingSlash(path) {
-    var length = path ? path.length : 0;
-    if (length > 1 && path[length - 1] === '/') {
-      path = path.substr(0, length - 1);
-    }
-    return path;
-  }
+	/**
+	* Removes trailing slash in path.
+	* @param {!string}
+	* @return {string}
+	*/
+	static removePathTrailingSlash(path) {
+		var length = path ? path.length : 0;
+		if (length > 1 && path[length - 1] === '/') {
+			path = path.substr(0, length - 1);
+		}
+		return path;
+	}
 }
 
 export default utils;
