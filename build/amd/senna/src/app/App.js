@@ -677,14 +677,10 @@ define(['exports', 'metal-dom/src/all/dom', 'metal/src/metal', 'metal-events/src
 				if (hash) {
 					var anchorElement = _globals2.default.document.getElementById(hash.substring(1));
 					if (anchorElement) {
-						var offsetLeft = 0,
-						    offsetTop = 0;
+						var _utils$getNodeOffset = _utils2.default.getNodeOffset(anchorElement),
+						    offsetLeft = _utils$getNodeOffset.offsetLeft,
+						    offsetTop = _utils$getNodeOffset.offsetTop;
 
-						do {
-							offsetLeft += anchorElement.offsetLeft;
-							offsetTop += anchorElement.offsetTop;
-							anchorElement = anchorElement.offsetParent;
-						} while (anchorElement);
 						_globals2.default.window.scrollTo(offsetLeft, offsetTop);
 					}
 				}
@@ -710,18 +706,11 @@ define(['exports', 'metal-dom/src/all/dom', 'metal/src/metal', 'metal-events/src
 				var hash = _globals2.default.window.location.hash;
 				var anchorElement = _globals2.default.document.getElementById(hash.substring(1));
 				if (anchorElement) {
-					var anchorElementAbsoluteOffsetLeft = anchorElement.offsetLeft;
-					var anchorElementAbsoluteOffsetTop = anchorElement.offsetTop;
-					while (anchorElement.offsetParent) {
-						if (anchorElement == _globals2.default.document.getElementsByTagName('body')[0]) {
-							break;
-						} else {
-							anchorElementAbsoluteOffsetLeft = anchorElementAbsoluteOffsetLeft + anchorElement.offsetParent.offsetLeft;
-							anchorElementAbsoluteOffsetTop = anchorElementAbsoluteOffsetTop + anchorElement.offsetParent.offsetTop;
-							anchorElement = anchorElement.offsetParent;
-						}
-					}
-					this.saveHistoryCurrentPageScrollPosition_(anchorElementAbsoluteOffsetTop, anchorElementAbsoluteOffsetLeft);
+					var _utils$getNodeOffset2 = _utils2.default.getNodeOffset(anchorElement),
+					    offsetLeft = _utils$getNodeOffset2.offsetLeft,
+					    offsetTop = _utils$getNodeOffset2.offsetTop;
+
+					this.saveHistoryCurrentPageScrollPosition_(offsetTop, offsetLeft);
 				}
 			}
 		}, {

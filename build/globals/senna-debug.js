@@ -2251,6 +2251,29 @@ var utils = function () {
 		}
 
 		/**
+   * Gets the given node offset coordinates.
+   * @return {!object}
+   * @static
+   */
+
+	}, {
+		key: 'getNodeOffset',
+		value: function getNodeOffset(node) {
+			var offsetLeft = 0,
+			    offsetTop = 0;
+
+			do {
+				offsetLeft += node.offsetLeft;
+				offsetTop += node.offsetTop;
+				node = node.offsetParent;
+			} while (node);
+			return {
+				offsetLeft: offsetLeft,
+				offsetTop: offsetTop
+			};
+		}
+
+		/**
    * Extracts the path part of an url.
    * @return {!string}
    * @static
@@ -7268,14 +7291,10 @@ var App$1 = function (_EventEmitter) {
 			if (hash) {
 				var anchorElement = globals.document.getElementById(hash.substring(1));
 				if (anchorElement) {
-					var offsetLeft = 0,
-					    offsetTop = 0;
+					var _utils$getNodeOffset = utils.getNodeOffset(anchorElement),
+					    offsetLeft = _utils$getNodeOffset.offsetLeft,
+					    offsetTop = _utils$getNodeOffset.offsetTop;
 
-					do {
-						offsetLeft += anchorElement.offsetLeft;
-						offsetTop += anchorElement.offsetTop;
-						anchorElement = anchorElement.offsetParent;
-					} while (anchorElement);
 					globals.window.scrollTo(offsetLeft, offsetTop);
 				}
 			}
@@ -7323,18 +7342,11 @@ var App$1 = function (_EventEmitter) {
 			var hash = globals.window.location.hash;
 			var anchorElement = globals.document.getElementById(hash.substring(1));
 			if (anchorElement) {
-				var anchorElementAbsoluteOffsetLeft = anchorElement.offsetLeft;
-				var anchorElementAbsoluteOffsetTop = anchorElement.offsetTop;
-				while (anchorElement.offsetParent) {
-					if (anchorElement == globals.document.getElementsByTagName('body')[0]) {
-						break;
-					} else {
-						anchorElementAbsoluteOffsetLeft = anchorElementAbsoluteOffsetLeft + anchorElement.offsetParent.offsetLeft;
-						anchorElementAbsoluteOffsetTop = anchorElementAbsoluteOffsetTop + anchorElement.offsetParent.offsetTop;
-						anchorElement = anchorElement.offsetParent;
-					}
-				}
-				this.saveHistoryCurrentPageScrollPosition_(anchorElementAbsoluteOffsetTop, anchorElementAbsoluteOffsetLeft);
+				var _utils$getNodeOffset2 = utils.getNodeOffset(anchorElement),
+				    offsetLeft = _utils$getNodeOffset2.offsetLeft,
+				    offsetTop = _utils$getNodeOffset2.offsetTop;
+
+				this.saveHistoryCurrentPageScrollPosition_(offsetTop, offsetLeft);
 			}
 		}
 
